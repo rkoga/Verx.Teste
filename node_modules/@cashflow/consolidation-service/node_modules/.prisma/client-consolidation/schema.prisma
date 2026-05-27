@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client-consolidation"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model DailyBalance {
+  id              String   @id @default(uuid())
+  date            DateTime @db.Date @unique
+  openingBalance  Decimal  @default(0) @map("opening_balance") @db.Decimal(15, 2)
+  totalCredits    Decimal  @default(0) @map("total_credits") @db.Decimal(15, 2)
+  totalDebits     Decimal  @default(0) @map("total_debits") @db.Decimal(15, 2)
+  closingBalance  Decimal  @default(0) @map("closing_balance") @db.Decimal(15, 2)
+  transactionCount Int     @default(0) @map("transaction_count")
+  consolidatedAt  DateTime @default(now()) @map("consolidated_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([date])
+  @@index([consolidatedAt])
+  @@map("daily_balances")
+}
+
+model ConsolidationLog {
+  id              String              @id @default(uuid())
+  date            DateTime            @db.Date
+  status          ConsolidationStatus
+  startedAt       DateTime            @default(now()) @map("started_at")
+  completedAt     DateTime?           @map("completed_at")
+  transactionsProcessed Int           @default(0) @map("transactions_processed")
+  errorMessage    String?             @map("error_message")
+  metadata        Json?
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@index([date])
+  @@index([status])
+  @@index([startedAt])
+  @@map("consolidation_logs")
+}
+
+enum ConsolidationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+// Made with Bob

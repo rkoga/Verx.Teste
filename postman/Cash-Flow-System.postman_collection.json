@@ -409,9 +409,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{consolidation_url}}/consolidation/balance/{{merchant_id}}/{{current_date}}",
+              "raw": "{{consolidation_url}}/consolidation/balance/{{current_date}}",
               "host": ["{{consolidation_url}}"],
-              "path": ["consolidation", "balance", "{{merchant_id}}", "{{current_date}}"]
+              "path": ["consolidation", "balance", "{{current_date}}"]
             }
           },
           "response": []
@@ -454,9 +454,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{consolidation_url}}/consolidation/balance/{{merchant_id}}?startDate={{start_date}}&endDate={{end_date}}",
+              "raw": "{{consolidation_url}}/consolidation/balance?startDate={{start_date}}&endDate={{end_date}}",
               "host": ["{{consolidation_url}}"],
-              "path": ["consolidation", "balance", "{{merchant_id}}"],
+              "path": ["consolidation", "balance"],
               "query": [
                 {
                   "key": "startDate",
@@ -512,9 +512,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{consolidation_url}}/consolidation/summary/{{merchant_id}}?startDate={{start_date}}&endDate={{end_date}}",
+              "raw": "{{consolidation_url}}/consolidation/summary?startDate={{start_date}}&endDate={{end_date}}",
               "host": ["{{consolidation_url}}"],
-              "path": ["consolidation", "summary", "{{merchant_id}}"],
+              "path": ["consolidation", "summary"],
               "query": [
                 {
                   "key": "startDate",

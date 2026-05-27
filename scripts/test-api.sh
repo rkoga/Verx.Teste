@@ -136,11 +136,10 @@ echo ""
 echo -e "${YELLOW}Test 8: Get Daily Balance${NC}"
 echo "-----------------------------------"
 
-MERCHANT_ID="merchant_123"
 TODAY=$(date +%Y-%m-%d)
 
 echo "Note: Balance might not exist yet if consolidation hasn't run"
-curl -s -X GET "$BASE_URL_CONSOLIDATION/consolidation/balance/$MERCHANT_ID/$TODAY" | jq '.' || echo "Balance not found (expected if consolidation hasn't run)"
+curl -s -X GET "$BASE_URL_CONSOLIDATION/consolidation/balance/$TODAY" | jq '.' || echo "Balance not found (expected if consolidation hasn't run)"
 echo ""
 
 # Test 9: Get Balance History
@@ -150,14 +149,14 @@ echo "-----------------------------------"
 START_DATE=$(date -d "30 days ago" +%Y-%m-%d 2>/dev/null || date -v-30d +%Y-%m-%d 2>/dev/null || echo "2026-04-26")
 END_DATE=$(date +%Y-%m-%d)
 
-curl -s -X GET "$BASE_URL_CONSOLIDATION/consolidation/balance/$MERCHANT_ID?startDate=$START_DATE&endDate=$END_DATE" | jq '.'
+curl -s -X GET "$BASE_URL_CONSOLIDATION/consolidation/balance?startDate=$START_DATE&endDate=$END_DATE" | jq '.'
 echo ""
 
 # Test 10: Get Summary
 echo -e "${YELLOW}Test 10: Get Consolidation Summary${NC}"
 echo "-----------------------------------"
 
-curl -s -X GET "$BASE_URL_CONSOLIDATION/consolidation/summary/$MERCHANT_ID?startDate=$START_DATE&endDate=$END_DATE" | jq '.'
+curl -s -X GET "$BASE_URL_CONSOLIDATION/consolidation/summary?startDate=$START_DATE&endDate=$END_DATE" | jq '.'
 echo ""
 
 # Summary

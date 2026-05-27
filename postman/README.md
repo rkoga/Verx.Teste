@@ -23,7 +23,6 @@ A collection já vem com as seguintes variáveis configuradas:
 |----------|--------------|-----------|
 | `transactions_url` | `http://localhost:3001/api/v1` | URL base do Transactions Service |
 | `consolidation_url` | `http://localhost:3002/api/v1` | URL base do Consolidation Service |
-| `merchant_id` | `merchant_123` | ID do merchant para testes |
 
 ### Variáveis Dinâmicas
 
@@ -226,8 +225,7 @@ Para diferentes ambientes, crie environments:
 ```json
 {
   "transactions_url": "http://localhost:3001/api/v1",
-  "consolidation_url": "http://localhost:3002/api/v1",
-  "merchant_id": "merchant_123"
+  "consolidation_url": "http://localhost:3002/api/v1"
 }
 ```
 
@@ -235,8 +233,7 @@ Para diferentes ambientes, crie environments:
 ```json
 {
   "transactions_url": "https://staging-api.cashflow.com/transactions/v1",
-  "consolidation_url": "https://staging-api.cashflow.com/consolidation/v1",
-  "merchant_id": "merchant_staging"
+  "consolidation_url": "https://staging-api.cashflow.com/consolidation/v1"
 }
 ```
 
@@ -244,8 +241,7 @@ Para diferentes ambientes, crie environments:
 ```json
 {
   "transactions_url": "https://api.cashflow.com/transactions/v1",
-  "consolidation_url": "https://api.cashflow.com/consolidation/v1",
-  "merchant_id": "merchant_prod"
+  "consolidation_url": "https://api.cashflow.com/consolidation/v1
 }
 ```
 

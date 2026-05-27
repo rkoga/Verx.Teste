@@ -144,7 +144,6 @@ Utilizaremos o **Strangler Fig Pattern** para migração gradual:
 -- Exemplo de migração de transações
 INSERT INTO new_system.transactions (
   id,
-  merchant_id,
   amount,
   type,
   date,
@@ -154,7 +153,6 @@ INSERT INTO new_system.transactions (
 )
 SELECT
   CONCAT('legacy_', id) as id,
-  merchant_id,
   ABS(amount) as amount,
   CASE 
     WHEN amount > 0 THEN 'CREDIT'

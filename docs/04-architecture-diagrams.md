@@ -644,7 +644,6 @@ erDiagram
     TRANSACTION ||--o{ TRANSACTION_CATEGORY : has
     TRANSACTION {
         uuid id PK
-        uuid merchant_id FK
         decimal amount
         enum type
         date transaction_date
@@ -664,7 +663,6 @@ erDiagram
     TRANSACTION ||--o{ DAILY_CONSOLIDATION : included_in
     DAILY_CONSOLIDATION {
         uuid id PK
-        uuid merchant_id FK
         date consolidation_date
         decimal opening_balance
         decimal total_credits
