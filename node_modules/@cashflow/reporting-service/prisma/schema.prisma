@@ -30,7 +30,7 @@ model TransactionReadModel {
   @@index([type, transactionDate])
   @@index([status, transactionDate])
   @@index([categoryId, transactionDate])
-  @@map("transaction_read_models")
+  @@map("transaction_read_model")
 }
 
 // Read Model: Daily balance snapshots for fast balance queries
@@ -47,7 +47,7 @@ model DailyBalanceReadModel {
   
   // Indexes
   @@index([date])
-  @@map("daily_balance_read_models")
+  @@map("daily_balance_read_model")
 }
 
 // Read Model: Aggregated statistics for dashboard
@@ -79,5 +79,5 @@ model CategorySummary {
   @@unique([categoryId, month])
   @@index([month])
   @@index([categoryId, month])
-  @@map("category_summaries")
+  @@map("category_summary")
 }

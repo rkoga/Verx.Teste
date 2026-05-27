@@ -22,10 +22,10 @@ function createRoutes(reportingService, prismaService, redisService) {
     // Transaction reports
     v1Router.get('/reports/transactions', (req, res) => transactionsController.getTransactions(req, res));
     v1Router.get('/reports/transactions/export', (req, res) => transactionsController.exportTransactions(req, res));
-    // Balance reports
-    v1Router.get('/reports/balance/:date', (req, res) => balanceController.getDailyBalance(req, res));
+    // Balance reports - Order matters! More specific routes first
     v1Router.get('/reports/balance/history', (req, res) => balanceController.getBalanceHistory(req, res));
     v1Router.get('/reports/balance/chart', (req, res) => balanceController.getBalanceChart(req, res));
+    v1Router.get('/reports/balance/:date', (req, res) => balanceController.getDailyBalance(req, res));
     // Dashboard
     v1Router.get('/reports/dashboard', (req, res) => dashboardController.getDashboard(req, res));
     v1Router.get('/reports/dashboard/categories', (req, res) => dashboardController.getCategorySummary(req, res));

@@ -1,9 +1,13 @@
 import {
   Controller,
   Get,
+  Post,
+  Body,
   Query,
   Param,
   NotFoundException,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -12,8 +16,9 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
-import { ConsolidationService } from '../../../application/services/consolidation.service';
+import { ConsolidationService, TransactionData } from '../../../application/services/consolidation.service';
 import { BalanceResponseDto } from '../dtos/balance-response.dto';
 
 @ApiTags('consolidation')
@@ -129,6 +134,52 @@ export class ConsolidationController {
       openingBalance: balances[balances.length - 1].openingBalance.value,
       closingBalance: balances[0].closingBalance.value,
     };
+  }
+
+  @Post('trigger/:date')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Manually trigger consolidation for a specific date' })
+  @ApiParam({ name: 'date', description: 'Date in YYYY-MM-DD format', example: '2026-05-27' })
+  @ApiBody({
+    description: 'Transactions to consolidate',
+    schema: {
+      type: 'object',
+      properties: {
+        transactions: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              amount: { type: 'number', example: 100.50 },
+              type: { type: 'string', enum: ['CREDIT', 'DEBIT'], example: 'CREDIT' },
+              date: { type: 'string', format: 'date', example: '2026-05-27' },
+            },
+            required: ['amount', 'type', 'date'],
+          },
+        },
+      },
+      required: ['transactions'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Consolidation triggered successfully',
+    type: BalanceResponseDto,
+  })
+  async triggerConsolidation(
+    @Param('date') dateStr: string,
+    @Body() body: { transactions: TransactionData[] },
+  ): Promise<BalanceResponseDto> {
+    // Parse date in local timezone to avoid timezone issues
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day, 12, 0, 0, 0); // Use noon to avoid timezone issues
+
+    const balance = await this.consolidationService.consolidateDay(
+      date,
+      body.transactions,
+    );
+
+    return BalanceResponseDto.fromEntity(balance);
   }
 }
 

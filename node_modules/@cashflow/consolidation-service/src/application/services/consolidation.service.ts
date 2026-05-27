@@ -4,6 +4,7 @@ import { DailyBalanceRepository } from '../../domain/repositories/daily-balance.
 import { DailyBalance } from '../../domain/entities/daily-balance.entity';
 import { Money } from '@shared/domain/value-objects/money.vo';
 import { Logger } from '@shared/infrastructure/logging/logger';
+import { Pool } from 'pg';
 
 export interface TransactionData {
   amount: number;
@@ -14,12 +15,20 @@ export interface TransactionData {
 @Injectable()
 export class ConsolidationService {
   private readonly logger: Logger;
+  private reportingPool: Pool;
 
   constructor(
     @Inject('DailyBalanceRepository')
     private readonly dailyBalanceRepository: DailyBalanceRepository,
   ) {
     this.logger = new Logger({ service: 'consolidation-service' });
+    
+    // Initialize connection pool to reporting database
+    this.reportingPool = new Pool({
+      connectionString: process.env.REPORTING_DATABASE_URL ||
+        'postgresql://cashflow:cashflow123@localhost:5432/reporting',
+      max: 5,
+    });
   }
 
   /**
@@ -94,6 +103,9 @@ export class ConsolidationService {
     // Save balance
     const savedBalance = await this.dailyBalanceRepository.save(dailyBalance);
 
+    // Also save to reporting database for read model
+    await this.syncToReportingDatabase(savedBalance);
+
     this.logger.info('Daily consolidation completed', {
       balanceId: savedBalance.id,
       date: date.toISOString().split('T')[0],
@@ -105,6 +117,51 @@ export class ConsolidationService {
     });
 
     return savedBalance;
+  }
+
+  /**
+   * Sync balance to reporting database
+   */
+  private async syncToReportingDatabase(balance: DailyBalance): Promise<void> {
+    try {
+      const query = `
+        INSERT INTO daily_balance_read_model (
+          id, date, "openingBalance", "totalCredits", "totalDebits",
+          "closingBalance", "transactionCount", "createdAt", "updatedAt"
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ON CONFLICT (date)
+        DO UPDATE SET
+          "openingBalance" = EXCLUDED."openingBalance",
+          "totalCredits" = EXCLUDED."totalCredits",
+          "totalDebits" = EXCLUDED."totalDebits",
+          "closingBalance" = EXCLUDED."closingBalance",
+          "transactionCount" = EXCLUDED."transactionCount",
+          "updatedAt" = EXCLUDED."updatedAt"
+      `;
+
+      await this.reportingPool.query(query, [
+        balance.id,
+        balance.date,
+        balance.openingBalance.value,
+        balance.totalCredits.value,
+        balance.totalDebits.value,
+        balance.closingBalance.value,
+        balance.transactionCount,
+        balance.createdAt,
+        balance.updatedAt,
+      ]);
+
+      this.logger.info('Synced balance to reporting database', {
+        balanceId: balance.id,
+        date: balance.date.toISOString().split('T')[0],
+      });
+    } catch (error: any) {
+      this.logger.error('Failed to sync to reporting database', {
+        error: error.message,
+        balanceId: balance.id,
+      });
+      // Don't throw - consolidation should succeed even if sync fails
+    }
   }
 
   /**

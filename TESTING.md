@@ -97,14 +97,6 @@ curl "http://localhost:3001/api/v1/transactions?startDate=2026-05-01&endDate=202
 curl http://localhost:3001/api/v1/transactions/{transaction_id}
 ```
 
-#### 6. Cancelar Transação
-```bash
-curl -X PATCH http://localhost:3001/api/v1/transactions/{transaction_id}/cancel \
-  -H "Content-Type: application/json" \
-  -d '{
-    "reason": "Cliente solicitou cancelamento"
-  }'
-```
 
 ### Consolidation Service (Porta 3002)
 
