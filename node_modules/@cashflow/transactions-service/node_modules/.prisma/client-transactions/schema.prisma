@@ -21,24 +21,22 @@ model Category {
 }
 
 model TransactionModel {
-  id             String            @id @default(uuid())
-  amount         Decimal           @db.Decimal(15, 2)
+  id             String          @id @default(uuid())
+  amount         Decimal         @db.Decimal(15, 2)
   type           TransactionType
-  date           DateTime          @db.Date
+  date           DateTime        @db.Date
   description    String
-  categoryId     String?           @map("category_id")
-  status         TransactionStatus @default(ACTIVE)
-  idempotencyKey String            @unique @map("idempotency_key")
-  createdAt      DateTime          @default(now()) @map("created_at")
-  updatedAt      DateTime          @updatedAt @map("updated_at")
-  cancelledAt    DateTime?         @map("cancelled_at")
-  cancelReason   String?           @map("cancel_reason")
-  consolidatedAt DateTime?         @map("consolidated_at")
+  categoryId     String?         @map("category_id")
+  idempotencyKey String          @unique @map("idempotency_key")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  cancelledAt    DateTime?       @map("cancelled_at")
+  cancelReason   String?         @map("cancel_reason")
+  consolidatedAt DateTime?       @map("consolidated_at")
 
   category Category? @relation(fields: [categoryId], references: [id])
 
   @@index([date])
-  @@index([status])
   @@index([type])
   @@index([createdAt])
   @@map("transactions")
@@ -47,10 +45,4 @@ model TransactionModel {
 enum TransactionType {
   CREDIT
   DEBIT
-}
-
-enum TransactionStatus {
-  ACTIVE
-  CANCELLED
-  CONSOLIDATED
 }

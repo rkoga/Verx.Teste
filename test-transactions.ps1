@@ -79,34 +79,4 @@ try {
 }
 Write-Host ""
 
-# Test 6: Cancel Transaction
-if ($creditId) {
-    Write-Host "6. Cancelling Transaction..." -ForegroundColor Yellow
-    $cancelData = @{
-        reason = "Test cancellation"
-    } | ConvertTo-Json
-
-    try {
-        $response = Invoke-RestMethod -Uri "$baseUrl/transactions/$creditId/cancel" -Method PATCH -Body $cancelData -ContentType "application/json"
-        Write-Host "Success: Transaction Cancelled" -ForegroundColor Green
-        $response | ConvertTo-Json
-    } catch {
-        Write-Host "Failed: Cancel Transaction - $_" -ForegroundColor Red
-    }
-    Write-Host ""
-}
-
-# Test 7: Verify Cancelled Transaction
-if ($creditId) {
-    Write-Host "7. Verifying Cancelled Transaction..." -ForegroundColor Yellow
-    try {
-        $response = Invoke-RestMethod -Uri "$baseUrl/transactions/$creditId" -Method GET
-        Write-Host "Success: Transaction Status - $($response.status)" -ForegroundColor Green
-        $response | ConvertTo-Json
-    } catch {
-        Write-Host "Failed: Verify Transaction - $_" -ForegroundColor Red
-    }
-    Write-Host ""
-}
-
 Write-Host "=== Tests Complete ===" -ForegroundColor Cyan

@@ -69,37 +69,14 @@ if (-not $allHealthy) {
 Write-Host "[2/8] Criando transacao de CREDITO..." -ForegroundColor Yellow
 
 $creditTransaction = @{
+    idempotencyKey = [guid]::NewGuid().ToString()
     amount = 150.75
     type = "CREDIT"
+    date = (Get-Date -Format "yyyy-MM-dd")
     description = "Venda de produto - Teste automatizado"
 }
 
-$result = Invoke-ApiRequest -Method "POST" -Url "http://localhost:3001/transactions" -Body $creditTransaction
-
-if ($result.Success) {
-    $transactionId = $result.Data.id
-    Write-Host "OK - Transacao criada com sucesso!" -ForegroundColor Green
-    Write-Host "  ID: $transactionId" -ForegroundColor Gray
-    Write-Host "  Valor: R$ $($result.Data.amount)" -ForegroundColor Gray
-    Write-Host "  Tipo: $($result.Data.type)" -ForegroundColor Gray
-    Write-Host "  Status: $($result.Data.status)" -ForegroundColor Gray
-} else {
-    Write-Host "ERRO - Erro ao criar transacao: $($result.Error)" -ForegroundColor Red
-}
-
-Write-Host ""
-Start-Sleep -Seconds 1
-
-# Teste 3: Criar transacao de Debito
-Write-Host "[3/8] Criando transacao de DEBITO..." -ForegroundColor Yellow
-
-$debitTransaction = @{
-    amount = 50.25
-    type = "DEBIT"
-    description = "Pagamento de fornecedor - Teste automatizado"
-}
-
-$result = Invoke-ApiRequest -Method "POST" -Url "http://localhost:3001/transactions" -Body $debitTransaction
+$result = Invoke-ApiRequest -Method "POST" -Url "http://localhost:3001/api/v1/transactions" -Body $creditTransaction
 
 if ($result.Success) {
     Write-Host "OK - Transacao criada com sucesso!" -ForegroundColor Green
@@ -113,11 +90,37 @@ if ($result.Success) {
 Write-Host ""
 Start-Sleep -Seconds 1
 
+# Teste 3: Criar transacao de Debito
+Write-Host "[3/8] Criando transacao de DEBITO..." -ForegroundColor Yellow
+
+$debitTransaction = @{
+    idempotencyKey = [guid]::NewGuid().ToString()
+    amount = 50.25
+    type = "DEBIT"
+    date = (Get-Date -Format "yyyy-MM-dd")
+    description = "Pagamento de fornecedor - Teste automatizado"
+}
+
+$result = Invoke-ApiRequest -Method "POST" -Url "http://localhost:3001/api/v1/transactions" -Body $debitTransaction
+
+if ($result.Success) {
+    $transactionId = $result.Data.id
+    Write-Host "OK - Transacao criada com sucesso!" -ForegroundColor Green
+    Write-Host "  ID: $transactionId" -ForegroundColor Gray
+    Write-Host "  Valor: R$ $($result.Data.amount)" -ForegroundColor Gray
+    Write-Host "  Tipo: $($result.Data.type)" -ForegroundColor Gray
+} else {
+    Write-Host "ERRO - Erro ao criar transacao: $($result.Error)" -ForegroundColor Red
+}
+
+Write-Host ""
+Start-Sleep -Seconds 1
+
 # Teste 4: Buscar Transacao por ID
 Write-Host "[4/8] Buscando Transacao por ID..." -ForegroundColor Yellow
 
 if ($transactionId) {
-    $result = Invoke-ApiRequest -Method "GET" -Url "http://localhost:3001/transactions/$transactionId"
+    $result = Invoke-ApiRequest -Method "GET" -Url "http://localhost:3001/api/v1/transactions/$transactionId"
     
     if ($result.Success) {
         Write-Host "OK - Transacao encontrada!" -ForegroundColor Green
@@ -137,7 +140,7 @@ Start-Sleep -Seconds 1
 # Teste 5: Listar Transacoes do Merchant
 Write-Host "[5/8] Listando Transacoes do merchant..." -ForegroundColor Yellow
 
-$result = Invoke-ApiRequest -Method "GET" -Url "http://localhost:3001/transactions"
+$result = Invoke-ApiRequest -Method "GET" -Url "http://localhost:3001/api/v1/transactions"
 
 if ($result.Success) {
     $count = $result.Data.Count
@@ -163,7 +166,7 @@ Write-Host "  (Aguardando processamento da consolidacao...)" -ForegroundColor Gr
 Start-Sleep -Seconds 3
 
 $today = Get-Date -Format "yyyy-MM-dd"
-$result = Invoke-ApiRequest -Method "GET" -Url "http://localhost:3002/consolidation/balance/$today"
+$result = Invoke-ApiRequest -Method "GET" -Url "http://localhost:3002/api/v1/consolidation/balance/$today"
 
 if ($result.Success) {
     Write-Host "OK - Saldo consolidado obtido!" -ForegroundColor Green
@@ -199,25 +202,6 @@ if ($result.Success) {
     Write-Host "Erro ao obter relatorio: $($result.Error)" -ForegroundColor Red
 }
 
-Write-Host ""
-Start-Sleep -Seconds 1
-
-# Teste 8: Cancelar Transacao
-Write-Host "[8/8] Cancelando Transacao..." -ForegroundColor Yellow
-
-if ($transactionId) {
-    $result = Invoke-ApiRequest -Method "PATCH" -Url "http://localhost:3001/transactions/$transactionId/cancel"
-    
-    if ($result.Success) {
-        Write-Host "OK - Transacao cancelada com sucesso!" -ForegroundColor Green
-        Write-Host "  ID: $($result.Data.id)" -ForegroundColor Gray
-        Write-Host "  Status: $($result.Data.status)" -ForegroundColor Gray
-    } else {
-        Write-Host "ERRO - Erro ao cancelar transacao: $($result.Error)" -ForegroundColor Red
-    }
-} else {
-    Write-Host "AVISO - Nenhuma transacao para cancelar" -ForegroundColor Yellow
-}   
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
