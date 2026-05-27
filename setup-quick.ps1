@@ -94,5 +94,3 @@ Write-Host "     cd services/transactions; npm run dev" -ForegroundColor Gray
 Write-Host "     cd services/consolidation; npm run dev" -ForegroundColor Gray
 Write-Host "     cd services/reporting; npm run dev" -ForegroundColor Gray
 Write-Host ""
-
-# Made with Bob

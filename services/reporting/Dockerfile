@@ -46,5 +46,3 @@ USER nodejs
 EXPOSE 3003
 
 CMD ["node", "dist/server.js"]
-
-# Made with Bob

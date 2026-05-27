@@ -49,5 +49,3 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
 
 # Start application
 CMD ["node", "dist/main.js"]
-
-# Made with Bob

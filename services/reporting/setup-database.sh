@@ -93,5 +93,3 @@ echo "  1. Iniciar o serviço: npm run dev"
 echo "  2. Testar health check: curl http://localhost:3003/api/v1/health"
 echo "  3. Abrir Prisma Studio: npx prisma studio"
 echo ""
-
-# Made with Bob

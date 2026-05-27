@@ -110,5 +110,3 @@ if ($creditId) {
 }
 
 Write-Host "=== Tests Complete ===" -ForegroundColor Cyan
-
-# Made with Bob

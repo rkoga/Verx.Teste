@@ -139,7 +139,6 @@ O Cash Flow Control System é uma solução empresarial para gerenciamento de fl
 ```powershell
 # 1. Clone o repositório
 git clone <repository-url>
-cd "IBM BOB"
 
 # 2. Instale as dependências
 npm install
@@ -532,9 +531,3 @@ Para suporte, consulte:
 **Status**: ✅ Produção Ready  
 **Última Atualização**: 26/05/2026  
 **Versão**: 1.0.0
-
----
-
-*Built with ❤️ by Bob - Your AI Software Engineer*#   V e r x . T e s t e  
- #   V e r x . T e s t e  
- 

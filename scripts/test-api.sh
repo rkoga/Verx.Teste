@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Script para testar as APIs dos serviços
-# Made with Bob
 
 set -e
 

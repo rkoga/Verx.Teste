@@ -249,5 +249,3 @@ Write-Host ""
 
 Write-Host "Pressione qualquer tecla para sair..." -ForegroundColor Yellow
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-
-# Made with Bob

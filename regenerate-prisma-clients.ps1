@@ -36,4 +36,3 @@ Write-Host ""
 Write-Host "Próximo passo: Criar migrations" -ForegroundColor Yellow
 Write-Host "Execute: .\create-migrations.ps1" -ForegroundColor Yellow
 
-# Made with Bob

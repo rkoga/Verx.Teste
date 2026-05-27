@@ -1,7 +1,7 @@
 # 📦 Resumo de Entrega - Cash Flow Control System
 
 **Data de Entrega**: 26 de Maio de 2026  
-**Desenvolvedor**: Bob - AI Software Engineer  
+**Desenvolvedor**: Rafael Koga
 **Status**: ✅ **COMPLETO E PRONTO PARA USO**
 
 ---

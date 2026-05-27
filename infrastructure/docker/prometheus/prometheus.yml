@@ -48,4 +48,3 @@ scrape_configs:
         labels:
           service: 'rabbitmq'
 
-# Made with Bob

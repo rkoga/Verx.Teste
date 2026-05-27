@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Script para testar os serviços do Cash Flow System
-# Made with Bob
-
 set -e
 
 echo "🚀 Cash Flow System - Test Script"

@@ -6,7 +6,7 @@ Guia rápido para iniciar o frontend do Cash Flow System.
 
 ### 1️⃣ Certifique-se que o Backend está rodando
 
-Na raiz do projeto principal (`IBM BOB`):
+Na raiz do projeto principal 
 
 ```powershell
 # Iniciar todos os serviços backend

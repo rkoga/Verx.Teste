@@ -159,4 +159,3 @@ Write-Host "  2. Testar health check: curl http://localhost:3003/api/v1/health"
 Write-Host "  3. Abrir Prisma Studio: npx prisma studio"
 Write-Host ""
 
-# Made with Bob

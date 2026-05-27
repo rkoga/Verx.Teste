@@ -135,5 +135,3 @@ if ($success) {
     Write-Host ""
     exit 1
 }
-
-# Made with Bob

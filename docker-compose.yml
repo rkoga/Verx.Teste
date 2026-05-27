@@ -220,5 +220,3 @@ volumes:
 networks:
   cashflow-network:
     driver: bridge
-
-# Made with Bob

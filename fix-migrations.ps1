@@ -91,5 +91,3 @@ Write-Host "Proximos passos:" -ForegroundColor Cyan
 Write-Host "  1. Execute: .\rebuild-all.ps1" -ForegroundColor White
 Write-Host "  2. Ou inicie os servicos: .\start-all-services.ps1" -ForegroundColor White
 Write-Host ""
-
-# Made with Bob

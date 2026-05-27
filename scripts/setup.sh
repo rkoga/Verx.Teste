@@ -153,5 +153,3 @@ echo ""
 echo -e "${BLUE}To stop services:${NC}"
 echo -e "  ${YELLOW}docker-compose down${NC}"
 echo ""
-
-# Made with Bob

@@ -46,4 +46,3 @@ Write-Host "Agora execute:" -ForegroundColor Cyan
 Write-Host "  .\start-all-services.ps1" -ForegroundColor White
 Write-Host ""
 
-# Made with Bob
