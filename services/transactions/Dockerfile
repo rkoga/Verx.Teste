@@ -3,21 +3,24 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy root package files
-COPY package*.json ./
-COPY tsconfig.json ./
+# Copy shared module to the expected location
+COPY shared ../../shared
 
-# Copy shared module
-COPY shared ./shared
-
-# Copy service files
-COPY services/transactions ./services/transactions
+# Copy service package files
+COPY services/transactions/package*.json ./
 
 # Install dependencies
 RUN npm install
 
+# Copy config files
+COPY services/transactions/tsconfig.json ./
+COPY services/transactions/nest-cli.json ./
+
+# Copy source code from transactions service
+COPY services/transactions/src ./src
+COPY services/transactions/prisma ./prisma
+
 # Generate Prisma Client
-WORKDIR /app/services/transactions
 RUN npx prisma generate
 
 # Build the application
@@ -29,20 +32,15 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package files
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/services/transactions/package*.json ./services/transactions/
+COPY services/transactions/package*.json ./
 
 # Install production dependencies only
 RUN npm install --production
 
-# Copy built application
-COPY --from=builder /app/services/transactions/dist ./services/transactions/dist
-COPY --from=builder /app/services/transactions/prisma ./services/transactions/prisma
-COPY --from=builder /app/shared/dist ./shared/dist
-
-# Generate Prisma Client in production
-WORKDIR /app/services/transactions
-RUN npx prisma generate
+# Copy built application from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/prisma ./prisma
 
 # Expose port
 EXPOSE 3001
@@ -54,3 +52,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 # Start the application
 CMD ["node", "dist/main.js"]
 
+# Made with Bob

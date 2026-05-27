@@ -22,8 +22,6 @@ export class PrismaTransactionRepository implements TransactionRepository {
       description: transaction.description || '',
       categoryId: transaction.categoryId,
       idempotencyKey: transaction.metadata?.idempotencyKey || transaction.id,
-      cancelledAt: transaction.cancelledAt,
-      cancelReason: transaction.cancelReason,
     };
 
     let prismaTransaction;
@@ -136,8 +134,6 @@ export class PrismaTransactionRepository implements TransactionRepository {
       metadata: { idempotencyKey: prismaTransaction.idempotencyKey },
       createdAt: prismaTransaction.createdAt,
       updatedAt: prismaTransaction.updatedAt,
-      cancelledAt: prismaTransaction.cancelledAt || undefined,
-      cancelReason: prismaTransaction.cancelReason || undefined,
     });
   }
 }

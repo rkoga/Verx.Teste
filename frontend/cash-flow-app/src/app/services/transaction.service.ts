@@ -5,7 +5,6 @@ import { environment } from '../../environments/environment';
 import {
   Transaction,
   CreateTransactionDto,
-  CancelTransactionDto,
   PaginatedTransactions,
   TransactionFilters
 } from '../models/transaction.model';
@@ -38,10 +37,6 @@ export class TransactionService {
     }
 
     return this.http.get<PaginatedTransactions>(this.apiUrl, { params });
-  }
-
-  cancelTransaction(id: string, dto: CancelTransactionDto): Observable<Transaction> {
-    return this.http.patch<Transaction>(`${this.apiUrl}/${id}/cancel`, dto);
   }
 
   generateIdempotencyKey(): string {

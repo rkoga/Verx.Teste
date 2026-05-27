@@ -51,18 +51,6 @@ export class TransactionResponseDto {
   })
   updatedAt: string;
 
-  @ApiPropertyOptional({
-    description: 'Cancellation timestamp',
-    example: '2026-05-26T15:00:00.000Z',
-  })
-  cancelledAt?: string;
-
-  @ApiPropertyOptional({
-    description: 'Cancellation reason',
-    example: 'Customer requested cancellation',
-  })
-  cancelReason?: string;
-
   static fromEntity(transaction: Transaction): TransactionResponseDto {
     return {
       id: transaction.id,
@@ -73,8 +61,6 @@ export class TransactionResponseDto {
       categoryId: transaction.categoryId,
       createdAt: transaction.createdAt.toISOString(),
       updatedAt: transaction.updatedAt.toISOString(),
-      cancelledAt: transaction.cancelledAt?.toISOString(),
-      cancelReason: transaction.cancelReason,
     };
   }
 }

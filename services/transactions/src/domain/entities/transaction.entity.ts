@@ -1,7 +1,6 @@
 import { Money } from '@shared/domain/value-objects/money.vo';
 import { TransactionType } from '../value-objects/transaction-type.vo';
 import { TransactionCreatedEvent } from '../events/transaction-created.event';
-import { TransactionCancelledEvent } from '../events/transaction-cancelled.event';
 
 export interface TransactionProps {
   id?: string;
@@ -12,8 +11,6 @@ export interface TransactionProps {
   metadata?: Record<string, any>;
   createdAt?: Date;
   updatedAt?: Date;
-  cancelledAt?: Date;
-  cancelReason?: string;
 }
 
 export class Transaction {
@@ -25,8 +22,6 @@ export class Transaction {
   private readonly _metadata?: Record<string, any>;
   private readonly _createdAt: Date;
   private _updatedAt: Date;
-  private _cancelledAt?: Date;
-  private _cancelReason?: string;
   private _domainEvents: any[] = [];
 
   constructor(props: TransactionProps) {
@@ -38,8 +33,6 @@ export class Transaction {
     this._metadata = props.metadata;
     this._createdAt = props.createdAt || new Date();
     this._updatedAt = props.updatedAt || new Date();
-    this._cancelledAt = props.cancelledAt;
-    this._cancelReason = props.cancelReason;
 
     this.validate();
   }
@@ -85,30 +78,6 @@ export class Transaction {
     return new Transaction(props);
   }
 
-  // Business Logic
-  cancel(reason: string): void {
-    if (this._cancelledAt) {
-      throw new Error('Transaction is already cancelled');
-    }
-
-    if (this._type.isCredit()) {
-      throw new Error('Credit transactions cannot be cancelled');
-    }
-
-    this._cancelledAt = new Date();
-    this._cancelReason = reason;
-    this._updatedAt = new Date();
-
-    this.addDomainEvent(
-      new TransactionCancelledEvent({
-        transactionId: this._id,
-        merchantId: 'default',
-        reason,
-        timestamp: this._cancelledAt,
-      })
-    );
-  }
-
   // Getters
   get id(): string {
     return this._id;
@@ -142,14 +111,6 @@ export class Transaction {
     return this._updatedAt;
   }
 
-  get cancelledAt(): Date | undefined {
-    return this._cancelledAt;
-  }
-
-  get cancelReason(): string | undefined {
-    return this._cancelReason;
-  }
-
   get domainEvents(): any[] {
     return this._domainEvents;
   }
@@ -172,10 +133,6 @@ export class Transaction {
     return this._type.isCredit();
   }
 
-  isCancelled(): boolean {
-    return !!this._cancelledAt;
-  }
-
   toJSON(): Record<string, any> {
     return {
       id: this._id,
@@ -187,8 +144,6 @@ export class Transaction {
       metadata: this._metadata,
       createdAt: this._createdAt.toISOString(),
       updatedAt: this._updatedAt.toISOString(),
-      cancelledAt: this._cancelledAt?.toISOString(),
-      cancelReason: this._cancelReason,
     };
   }
 }

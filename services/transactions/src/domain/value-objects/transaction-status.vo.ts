@@ -1,7 +1,6 @@
 export enum TransactionStatusEnum {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED',
 }
 
 export class TransactionStatus {
@@ -19,10 +18,6 @@ export class TransactionStatus {
     return new TransactionStatus(TransactionStatusEnum.COMPLETED);
   }
 
-  static cancelled(): TransactionStatus {
-    return new TransactionStatus(TransactionStatusEnum.CANCELLED);
-  }
-
   static fromString(value: string): TransactionStatus {
     const upperValue = value.toUpperCase();
     
@@ -32,10 +27,6 @@ export class TransactionStatus {
     
     if (upperValue === TransactionStatusEnum.COMPLETED) {
       return TransactionStatus.completed();
-    }
-    
-    if (upperValue === TransactionStatusEnum.CANCELLED) {
-      return TransactionStatus.cancelled();
     }
     
     throw new Error(`Invalid transaction status: ${value}`);
@@ -51,10 +42,6 @@ export class TransactionStatus {
 
   isCompleted(): boolean {
     return this._value === TransactionStatusEnum.COMPLETED;
-  }
-
-  isCancelled(): boolean {
-    return this._value === TransactionStatusEnum.CANCELLED;
   }
 
   equals(other: TransactionStatus): boolean {

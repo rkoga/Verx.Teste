@@ -5,11 +5,8 @@ export interface Transaction {
   date: string;
   description: string;
   categoryId?: string;
-  status: 'ACTIVE' | 'CANCELLED';
   createdAt: string;
   updatedAt: string;
-  cancelledAt?: string;
-  cancellationReason?: string;
 }
 
 export interface CreateTransactionDto {
@@ -19,10 +16,6 @@ export interface CreateTransactionDto {
   date: string;
   description: string;
   categoryId?: string;
-}
-
-export interface CancelTransactionDto {
-  reason: string;
 }
 
 export interface PaginatedTransactions {

@@ -311,46 +311,6 @@
             }
           },
           "response": []
-        },
-        {
-          "name": "Cancel Transaction",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test('Transaction status is CANCELLED', function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.status).to.eql('CANCELLED');",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"reason\": \"Cliente solicitou cancelamento\"\n}"
-            },
-            "url": {
-              "raw": "{{transactions_url}}/transactions/{{transaction_id}}/cancel",
-              "host": ["{{transactions_url}}"],
-              "path": ["transactions", "{{transaction_id}}", "cancel"]
-            }
-          },
-          "response": []
         }
       ]
     },

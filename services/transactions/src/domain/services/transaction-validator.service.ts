@@ -145,29 +145,6 @@ export class TransactionValidatorService {
     };
   }
 
-  /**
-   * Validate cancellation
-   */
-  validateCancellation(reason: string): ValidationResult {
-    const errors: string[] = [];
-
-    if (!reason || reason.trim().length === 0) {
-      errors.push('Cancellation reason is required');
-    }
-
-    if (reason && reason.length < 10) {
-      errors.push('Cancellation reason must be at least 10 characters');
-    }
-
-    if (reason && reason.length > 500) {
-      errors.push('Cancellation reason cannot exceed 500 characters');
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
-  }
 
   /**
    * Check if amount is suspicious (potential fraud)

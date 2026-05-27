@@ -44,7 +44,7 @@ export class TransactionsComponent implements OnInit {
   transactionForm: FormGroup;
   filterForm: FormGroup;
   transactions: Transaction[] = [];
-  displayedColumns: string[] = ['date', 'description', 'type', 'amount', 'status', 'actions'];
+  displayedColumns: string[] = ['date', 'description', 'type', 'amount', 'status'];
   isLoading = false;
   isSaving = false;
   
@@ -155,23 +155,6 @@ export class TransactionsComponent implements OnInit {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
     this.loadTransactions();
-  }
-
-  cancelTransaction(transaction: Transaction): void {
-    if (confirm(`Deseja realmente cancelar a transação "${transaction.description}"?`)) {
-      this.transactionService.cancelTransaction(transaction.id, {
-        reason: 'Cancelado pelo usuário'
-      }).subscribe({
-        next: () => {
-          this.showMessage('Transação cancelada com sucesso!', 'success');
-          this.loadTransactions();
-        },
-        error: (error) => {
-          console.error('Erro ao cancelar transação:', error);
-          this.showMessage('Erro ao cancelar transação', 'error');
-        }
-      });
-    }
   }
 
   formatDate(date: Date | string): string {

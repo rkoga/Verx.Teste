@@ -3,20 +3,22 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
-COPY nest-cli.json ./
+# Copy shared module to the expected location
+COPY shared ../../shared
 
-# Copy shared module
-COPY ../../shared ./shared
+# Copy package files from consolidation service
+COPY services/consolidation/package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
-# Copy source code
-COPY src ./src
-COPY prisma ./prisma
+# Copy config files
+COPY services/consolidation/tsconfig.json ./
+COPY services/consolidation/nest-cli.json ./
+
+# Copy source code from consolidation service
+COPY services/consolidation/src ./src
+COPY services/consolidation/prisma ./prisma
 
 # Generate Prisma Client
 RUN npx prisma generate
@@ -30,10 +32,10 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY services/consolidation/package*.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production
+RUN npm install --production
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
@@ -49,3 +51,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
 
 # Start application
 CMD ["node", "dist/main.js"]
+
+# Made with Bob

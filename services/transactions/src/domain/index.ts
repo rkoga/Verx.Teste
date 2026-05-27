@@ -7,7 +7,6 @@ export * from './value-objects/transaction-status.vo';
 
 // Events
 export * from './events/transaction-created.event';
-export * from './events/transaction-cancelled.event';
 
 // Repositories
 export * from './repositories/transaction.repository.interface';

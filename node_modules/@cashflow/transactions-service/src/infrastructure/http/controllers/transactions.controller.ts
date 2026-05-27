@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Get,
-  Patch,
   Body,
   Param,
   Query,
@@ -17,19 +16,16 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { CreateTransactionDto } from '../dtos/create-transaction.dto';
-import { CancelTransactionDto } from '../dtos/cancel-transaction.dto';
 import { ListTransactionsDto } from '../dtos/list-transactions.dto';
 import {
   TransactionResponseDto,
   PaginatedTransactionResponseDto,
 } from '../dtos/transaction-response.dto';
 import { CreateTransactionCommand } from '../../../application/commands/create-transaction.command';
-import { CancelTransactionCommand } from '../../../application/commands/cancel-transaction.command';
 import { GetTransactionQuery } from '../../../application/queries/get-transaction.query';
 import { ListTransactionsQuery } from '../../../application/queries/list-transactions.query';
 import {
   CreateTransactionHandler,
-  CancelTransactionHandler,
   GetTransactionHandler,
   ListTransactionsHandler,
 } from '../../../application/handlers';
@@ -40,7 +36,6 @@ import {
 export class TransactionsController {
   constructor(
     private readonly createTransactionHandler: CreateTransactionHandler,
-    private readonly cancelTransactionHandler: CancelTransactionHandler,
     private readonly getTransactionHandler: GetTransactionHandler,
     private readonly listTransactionsHandler: ListTransactionsHandler,
   ) {}
@@ -118,25 +113,6 @@ export class TransactionsController {
     return TransactionResponseDto.fromEntity(transaction);
   }
 
-  @Patch(':id/cancel')
-  @ApiOperation({ summary: 'Cancel a transaction' })
-  @ApiParam({ name: 'id', description: 'Transaction ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'Transaction cancelled successfully',
-    type: TransactionResponseDto,
-  })
-  @ApiResponse({ status: 400, description: 'Bad request (e.g., transaction cannot be cancelled)' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Transaction not found' })
-  async cancelTransaction(
-    @Param('id') id: string,
-    @Body() dto: CancelTransactionDto,
-  ): Promise<TransactionResponseDto> {
-    const command = new CancelTransactionCommand(id, dto.reason);
-    const transaction = await this.cancelTransactionHandler.execute(command);
-    return TransactionResponseDto.fromEntity(transaction);
-  }
 }
 
 // Made with Bob

@@ -6,7 +6,6 @@ import { PrismaService } from './infrastructure/persistence/prisma.service';
 import { PrismaTransactionRepository } from './infrastructure/persistence/transaction.repository';
 import {
   CreateTransactionHandler,
-  CancelTransactionHandler,
   GetTransactionHandler,
   ListTransactionsHandler,
 } from './application/handlers';
@@ -31,7 +30,6 @@ const TRANSACTION_REPOSITORY = 'TransactionRepository';
       useClass: PrismaTransactionRepository,
     },
     CreateTransactionHandler,
-    CancelTransactionHandler,
     GetTransactionHandler,
     ListTransactionsHandler,
   ],
