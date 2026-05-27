@@ -1,0 +1,179 @@
+<div class="dashboard-container">
+  <!-- Filtro de Período -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="period-filter">
+        <div class="filter-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Data Início</mat-label>
+            <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+            <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Data Fim</mat-label>
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="applyFilter()">
+            <mat-icon>search</mat-icon>
+            Aplicar
+          </button>
+        </div>
+
+        <div class="quick-filters">
+          <span>Atalhos:</span>
+          <button mat-button (click)="setQuickFilter(0)">Hoje</button>
+          <button mat-button (click)="setQuickFilter(7)">7 dias</button>
+          <button mat-button (click)="setQuickFilter(30)">30 dias</button>
+          <button mat-button (click)="setQuickFilter(90)">90 dias</button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <app-loading [isLoading]="isLoading" message="Carregando dashboard..."></app-loading>
+
+  <!-- Cards de Métricas -->
+  <div class="metrics-grid" *ngIf="!isLoading">
+    <mat-card class="metric-card balance-card">
+      <mat-card-content>
+        <div class="metric-icon">
+          <mat-icon [color]="getBalanceColor()">account_balance_wallet</mat-icon>
+        </div>
+        <div class="metric-info">
+          <h3>Saldo Atual</h3>
+          <p class="metric-value" [class.positive]="currentBalance >= 0" [class.negative]="currentBalance < 0">
+            {{ formatCurrency(currentBalance) }}
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="metric-card credits-card">
+      <mat-card-content>
+        <div class="metric-icon">
+          <mat-icon color="primary">trending_up</mat-icon>
+        </div>
+        <div class="metric-info">
+          <h3>Total de Créditos</h3>
+          <p class="metric-value positive">
+            {{ formatCurrency(totalCredits) }}
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="metric-card debits-card">
+      <mat-card-content>
+        <div class="metric-icon">
+          <mat-icon color="warn">trending_down</mat-icon>
+        </div>
+        <div class="metric-info">
+          <h3>Total de Débitos</h3>
+          <p class="metric-value negative">
+            {{ formatCurrency(totalDebits) }}
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Resumo do Período -->
+  <mat-card class="summary-card" *ngIf="!isLoading && summary">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>summarize</mat-icon>
+        Resumo do Período
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Período:</span>
+          <span class="summary-value">
+            {{ formatDateDisplay(summary.period.startDate) }} até {{ formatDateDisplay(summary.period.endDate) }}
+          </span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Dias:</span>
+          <span class="summary-value">{{ summary.daysCount }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Saldo Inicial:</span>
+          <span class="summary-value">{{ formatCurrency(summary.openingBalance) }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Saldo Final:</span>
+          <span class="summary-value">{{ formatCurrency(summary.closingBalance) }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Variação:</span>
+          <span class="summary-value" [class.positive]="summary.netChange >= 0" [class.negative]="summary.netChange < 0">
+            {{ formatCurrency(summary.netChange) }}
+          </span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Histórico de Saldos -->
+  <mat-card class="history-card" *ngIf="!isLoading && balanceHistory.length > 0">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>history</mat-icon>
+        Histórico de Saldos Diários
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="history-list">
+        <div class="history-item" *ngFor="let balance of balanceHistory">
+          <div class="history-date">
+            <mat-icon>calendar_today</mat-icon>
+            {{ formatDateDisplay(balance.date) }}
+          </div>
+          <div class="history-details">
+            <div class="history-detail">
+              <span class="label">Abertura:</span>
+              <span class="value">{{ formatCurrency(balance.openingBalance) }}</span>
+            </div>
+            <div class="history-detail">
+              <span class="label">Créditos:</span>
+              <span class="value positive">{{ formatCurrency(balance.totalCredits) }}</span>
+            </div>
+            <div class="history-detail">
+              <span class="label">Débitos:</span>
+              <span class="value negative">{{ formatCurrency(balance.totalDebits) }}</span>
+            </div>
+            <div class="history-detail">
+              <span class="label">Fechamento:</span>
+              <span class="value" [class.positive]="balance.closingBalance >= 0" [class.negative]="balance.closingBalance < 0">
+                {{ formatCurrency(balance.closingBalance) }}
+              </span>
+            </div>
+            <div class="history-detail">
+              <span class="label">Transações:</span>
+              <span class="value">{{ balance.transactionCount }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Empty State -->
+  <mat-card class="empty-card" *ngIf="!isLoading && balanceHistory.length === 0">
+    <mat-card-content>
+      <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <h3>Nenhum dado encontrado</h3>
+        <p>Não há dados de saldo para o período selecionado.</p>
+        <p>Crie algumas transações primeiro!</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

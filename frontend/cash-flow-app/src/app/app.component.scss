@@ -1,0 +1,12 @@
+.main-content {
+  min-height: calc(100vh - 64px);
+  background-color: #fafafa;
+}
+
+@media (max-width: 600px) {
+  .main-content {
+    min-height: calc(100vh - 56px);
+  }
+}
+
+// Made with Bob

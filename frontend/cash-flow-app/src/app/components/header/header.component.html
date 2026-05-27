@@ -1,0 +1,19 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <span class="logo">
+      <mat-icon>account_balance</mat-icon>
+      {{ title }}
+    </span>
+    <span class="spacer"></span>
+    <nav class="nav-links">
+      <a mat-button routerLink="/transactions" routerLinkActive="active">
+        <mat-icon>receipt_long</mat-icon>
+        Transações
+      </a>
+      <a mat-button routerLink="/dashboard" routerLinkActive="active">
+        <mat-icon>dashboard</mat-icon>
+        Dashboard
+      </a>
+    </nav>
+  </mat-toolbar-row>
+</mat-toolbar>

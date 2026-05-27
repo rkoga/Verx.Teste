@@ -1,0 +1,69 @@
+{
+  "name": "cash-flow-system",
+  "version": "1.0.0",
+  "description": "Sistema de Controle de Fluxo de Caixa - Microserviços Event-Driven",
+  "private": true,
+  "workspaces": [
+    "services/*",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "docker-compose up",
+    "dev:build": "docker-compose up --build",
+    "dev:down": "docker-compose down -v",
+    "build": "npm run build --workspaces",
+    "build:transactions": "npm run build -w services/transactions",
+    "build:consolidation": "npm run build -w services/consolidation",
+    "build:reporting": "npm run build -w services/reporting",
+    "test": "npm run test --workspaces",
+    "test:unit": "npm run test:unit --workspaces",
+    "test:integration": "npm run test:integration --workspaces",
+    "test:e2e": "npm run test:e2e --workspaces",
+    "test:coverage": "npm run test:coverage --workspaces",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write \"**/*.{ts,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,json,md,yml,yaml}\"",
+    "db:migrate": "npm run db:migrate --workspaces",
+    "db:seed": "npm run db:seed --workspaces",
+    "db:reset": "npm run db:reset --workspaces",
+    "docker:build": "docker-compose -f docker-compose.prod.yml build",
+    "docker:push": "docker-compose -f docker-compose.prod.yml push",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "cash-flow",
+    "microservices",
+    "event-driven",
+    "nodejs",
+    "typescript",
+    "nestjs"
+  ],
+  "author": "Cash Flow Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

@@ -1,0 +1,284 @@
+# Reporting Service - Guia de Setup
+
+## 🚀 Setup Rápido
+
+### 1. Instalar Dependências
+
+```bash
+cd services/reporting
+npm install
+```
+
+### 2. Configurar Variáveis de Ambiente
+
+Copie o arquivo `.env` de exemplo:
+
+```bash
+cp .env.example .env
+```
+
+Ou crie manualmente com:
+
+```env
+# Server
+PORT=3003
+NODE_ENV=development
+
+# Database
+DATABASE_URL=postgresql://cashflow:cashflow123@localhost:5432/reporting_db
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# CORS
+CORS_ORIGIN=*
+
+# Logging
+LOG_LEVEL=info
+```
+
+### 3. Configurar Banco de Dados
+
+```bash
+# Gerar Prisma Client
+npx prisma generate
+
+# Executar migrations
+npx prisma migrate dev --name init
+
+# (Opcional) Seed inicial
+npx prisma db seed
+```
+
+### 4. Iniciar o Serviço
+
+```bash
+# Desenvolvimento (com hot reload)
+npm run dev
+
+# Produção
+npm run build
+npm start
+```
+
+O serviço estará disponível em: `http://localhost:3003`
+
+## 🐳 Setup com Docker
+
+### Opção 1: Docker Compose (Recomendado)
+
+```bash
+# Na raiz do projeto
+docker-compose up -d postgres redis
+docker-compose up reporting-service
+```
+
+### Opção 2: Docker Standalone
+
+```bash
+# Build
+docker build -t reporting-service .
+
+# Run
+docker run -p 3003:3003 \
+  -e DATABASE_URL=postgresql://cashflow:cashflow123@host.docker.internal:5432/reporting_db \
+  -e REDIS_URL=redis://host.docker.internal:6379 \
+  reporting-service
+```
+
+## ✅ Verificar Instalação
+
+### 1. Health Check
+
+```bash
+curl http://localhost:3003/api/v1/health
+```
+
+Resposta esperada:
+```json
+{
+  "status": "healthy",
+  "service": "reporting-service",
+  "checks": {
+    "database": { "status": "up" },
+    "redis": { "status": "up" }
+  }
+}
+```
+
+### 2. Testar Endpoints
+
+```bash
+# Dashboard
+curl http://localhost:3003/api/v1/reports/dashboard/merchant-123
+
+# Transações
+curl "http://localhost:3003/api/v1/reports/transactions/merchant-123?page=1&limit=10"
+
+# Saldo
+curl http://localhost:3003/api/v1/reports/balance/merchant-123/2024-01-01
+```
+
+## 📊 Popular Dados de Teste
+
+### Opção 1: Via Prisma Studio
+
+```bash
+npx prisma studio
+```
+
+Acesse: `http://localhost:5555`
+
+### Opção 2: Via Script SQL
+
+```sql
+-- Inserir transações de teste
+INSERT INTO transaction_read_models (
+  id, merchant_id, merchant_name, category_id, category_name,
+  type, amount, description, status, transaction_date, created_at, updated_at
+) VALUES
+  (gen_random_uuid(), 'merchant-123', 'Loja ABC', 'cat-1', 'Vendas', 
+   'CREDIT', 1000.00, 'Venda produto', 'COMPLETED', NOW(), NOW(), NOW()),
+  (gen_random_uuid(), 'merchant-123', 'Loja ABC', 'cat-2', 'Despesas', 
+   'DEBIT', 500.00, 'Compra estoque', 'COMPLETED', NOW(), NOW(), NOW());
+
+-- Inserir saldo diário
+INSERT INTO daily_balance_read_models (
+  id, merchant_id, merchant_name, date, opening_balance, 
+  total_credits, total_debits, closing_balance, transaction_count, created_at, updated_at
+) VALUES
+  (gen_random_uuid(), 'merchant-123', 'Loja ABC', CURRENT_DATE, 
+   0, 1000.00, 500.00, 500.00, 2, NOW(), NOW());
+
+-- Inserir estatísticas
+INSERT INTO merchant_statistics (
+  id, merchant_id, merchant_name, current_balance, 
+  total_credits_month, total_debits_month, total_transactions_month,
+  average_transaction_value, last_transaction_date, last_updated
+) VALUES
+  (gen_random_uuid(), 'merchant-123', 'Loja ABC', 500.00,
+   1000.00, 500.00, 2, 750.00, NOW(), NOW());
+```
+
+### Opção 3: Via API (Recomendado)
+
+Use o Transactions Service para criar transações, que serão automaticamente sincronizadas para o Reporting Service.
+
+## 🔧 Troubleshooting
+
+### Erro: "Cannot connect to database"
+
+```bash
+# Verificar se PostgreSQL está rodando
+docker ps | grep postgres
+
+# Verificar conexão
+psql postgresql://cashflow:cashflow123@localhost:5432/reporting_db -c "SELECT 1"
+
+# Recriar banco se necessário
+docker-compose down -v
+docker-compose up -d postgres
+```
+
+### Erro: "Cannot connect to Redis"
+
+```bash
+# Verificar se Redis está rodando
+docker ps | grep redis
+
+# Testar conexão
+redis-cli -h localhost -p 6379 ping
+
+# Reiniciar Redis
+docker-compose restart redis
+```
+
+### Erro: "Prisma Client not generated"
+
+```bash
+# Gerar novamente
+npx prisma generate
+
+# Limpar e regenerar
+rm -rf node_modules/.prisma
+npm install
+npx prisma generate
+```
+
+### Erro: "Port 3003 already in use"
+
+```bash
+# Encontrar processo usando a porta
+# Windows
+netstat -ano | findstr :3003
+
+# Linux/Mac
+lsof -i :3003
+
+# Matar processo ou mudar porta no .env
+PORT=3004 npm run dev
+```
+
+## 📝 Scripts Disponíveis
+
+```bash
+# Desenvolvimento
+npm run dev          # Inicia com nodemon (hot reload)
+
+# Produção
+npm run build        # Compila TypeScript
+npm start            # Inicia versão compilada
+
+# Database
+npm run prisma:generate  # Gera Prisma Client
+npm run prisma:migrate   # Executa migrations
+npm run prisma:studio    # Abre Prisma Studio
+
+# Testes
+npm test             # Executa testes unitários
+npm run test:e2e     # Executa testes E2E
+npm run test:cov     # Gera coverage
+
+# Linting
+npm run lint         # Verifica código
+npm run lint:fix     # Corrige automaticamente
+
+# Docker
+npm run docker:build # Build imagem Docker
+npm run docker:run   # Executa container
+```
+
+## 🔐 Segurança
+
+### Produção Checklist
+
+- [ ] Alterar credenciais padrão do banco
+- [ ] Configurar CORS apropriadamente
+- [ ] Adicionar rate limiting
+- [ ] Habilitar HTTPS
+- [ ] Configurar variáveis de ambiente seguras
+- [ ] Revisar logs para não expor dados sensíveis
+- [ ] Implementar autenticação/autorização
+- [ ] Configurar backup do banco de dados
+
+## 📚 Próximos Passos
+
+1. ✅ Serviço rodando
+2. ✅ Health check OK
+3. ✅ Dados de teste inseridos
+4. 📖 Ler [README.md](./README.md) para entender a arquitetura
+5. 🧪 Testar endpoints com Postman/Insomnia
+6. 📊 Configurar dashboards no Grafana
+7. 🔍 Implementar testes automatizados
+8. 🚀 Deploy em ambiente de staging
+
+## 🆘 Suporte
+
+- 📖 Documentação: [README.md](./README.md)
+- 🐛 Issues: GitHub Issues
+- 💬 Discussões: GitHub Discussions
+- 📧 Email: suporte@cashflow.com
+
+## 📄 Licença
+
+MIT

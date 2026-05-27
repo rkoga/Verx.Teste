@@ -1,0 +1,51 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'cashflow-monitor'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'transactions-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['transactions-service:3001']
+        labels:
+          service: 'transactions'
+
+  - job_name: 'consolidation-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['consolidation-service:3002']
+        labels:
+          service: 'consolidation'
+
+  - job_name: 'reporting-service'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['reporting-service:3003']
+        labels:
+          service: 'reporting'
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+        labels:
+          service: 'postgres'
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+        labels:
+          service: 'redis'
+
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15672']
+        labels:
+          service: 'rabbitmq'
+
+# Made with Bob

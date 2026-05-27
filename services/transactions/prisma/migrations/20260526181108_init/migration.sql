@@ -1,0 +1,59 @@
+-- CreateEnum
+CREATE TYPE "TransactionType" AS ENUM ('CREDIT', 'DEBIT');
+
+-- CreateEnum
+CREATE TYPE "TransactionStatus" AS ENUM ('ACTIVE', 'CANCELLED', 'CONSOLIDATED');
+
+-- CreateTable
+CREATE TABLE "categories" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "categories_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "transactions" (
+    "id" TEXT NOT NULL,
+    "amount" DECIMAL(15,2) NOT NULL,
+    "type" "TransactionType" NOT NULL,
+    "date" DATE NOT NULL,
+    "description" TEXT NOT NULL,
+    "category_id" TEXT,
+    "status" "TransactionStatus" NOT NULL DEFAULT 'ACTIVE',
+    "idempotency_key" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "cancelled_at" TIMESTAMP(3),
+    "cancel_reason" TEXT,
+    "consolidated_at" TIMESTAMP(3),
+
+    CONSTRAINT "transactions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "transactions_idempotency_key_key" ON "transactions"("idempotency_key");
+
+-- CreateIndex
+CREATE INDEX "transactions_merchant_id_idx" ON "transactions"("merchant_id");
+
+-- CreateIndex
+CREATE INDEX "transactions_date_idx" ON "transactions"("date");
+
+-- CreateIndex
+CREATE INDEX "transactions_status_idx" ON "transactions"("status");
+
+-- CreateIndex
+CREATE INDEX "transactions_type_idx" ON "transactions"("type");
+
+-- CreateIndex
+CREATE INDEX "transactions_created_at_idx" ON "transactions"("created_at");
+
+-- AddForeignKey
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_merchant_id_fkey" FOREIGN KEY ("merchant_id") REFERENCES "merchants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;

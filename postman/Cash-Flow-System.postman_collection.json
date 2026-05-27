@@ -1,0 +1,552 @@
+{
+  "info": {
+    "name": "Cash Flow System",
+    "description": "Collection para testar as APIs do Sistema de Controle de Fluxo de Caixa",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12345"
+  },
+  "item": [
+    {
+      "name": "Transactions Service",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{transactions_url}}/health",
+              "host": ["{{transactions_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Credit Transaction",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Generate UUID for idempotency key",
+                  "pm.environment.set('idempotency_key', pm.variables.replaceIn('{{$guid}}'));",
+                  "",
+                  "// Set current date",
+                  "const today = new Date().toISOString().split('T')[0];",
+                  "pm.environment.set('current_date', today);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has transaction ID', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.environment.set('transaction_id', jsonData.id);",
+                  "});",
+                  "",
+                  "pm.test('Transaction type is CREDIT', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.type).to.eql('CREDIT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idempotencyKey\": \"{{idempotency_key}}\",\n  \"amount\": 1500.00,\n  \"type\": \"CREDIT\",\n  \"date\": \"{{current_date}}\",\n  \"description\": \"Venda de produto X\",\n  \"categoryId\": \"cat_sales\"\n}"
+            },
+            "url": {
+              "raw": "{{transactions_url}}/transactions",
+              "host": ["{{transactions_url}}"],
+              "path": ["transactions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Debit Transaction",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.environment.set('idempotency_key', pm.variables.replaceIn('{{$guid}}'));",
+                  "const today = new Date().toISOString().split('T')[0];",
+                  "pm.environment.set('current_date', today);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Transaction type is DEBIT', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.type).to.eql('DEBIT');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idempotencyKey\": \"{{idempotency_key}}\",\n  \"amount\": 500.00,\n  \"type\": \"DEBIT\",\n  \"date\": \"{{current_date}}\",\n  \"description\": \"Compra de material\",\n  \"categoryId\": \"cat_expenses\"\n}"
+            },
+            "url": {
+              "raw": "{{transactions_url}}/transactions",
+              "host": ["{{transactions_url}}"],
+              "path": ["transactions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Test Idempotency (Duplicate)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 409 Conflict', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('Error message mentions duplicate', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message.toLowerCase()).to.include('already exists');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idempotencyKey\": \"{{idempotency_key}}\",\n  \"amount\": 1500.00,\n  \"type\": \"CREDIT\",\n  \"date\": \"{{current_date}}\",\n  \"description\": \"Duplicate transaction\",\n  \"categoryId\": \"cat_sales\"\n}"
+            },
+            "url": {
+              "raw": "{{transactions_url}}/transactions",
+              "host": ["{{transactions_url}}"],
+              "path": ["transactions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has transaction details', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('amount');",
+                  "    pm.expect(jsonData).to.have.property('type');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{transactions_url}}/transactions/{{transaction_id}}",
+              "host": ["{{transactions_url}}"],
+              "path": ["transactions", "{{transaction_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List All Transactions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has pagination', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('data');",
+                  "    pm.expect(jsonData).to.have.property('total');",
+                  "    pm.expect(jsonData).to.have.property('page');",
+                  "    pm.expect(jsonData).to.have.property('limit');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{transactions_url}}/transactions?page=1&limit=20",
+              "host": ["{{transactions_url}}"],
+              "path": ["transactions"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Transactions - Filter by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{transactions_url}}/transactions?type=CREDIT&page=1&limit=20",
+              "host": ["{{transactions_url}}"],
+              "path": ["transactions"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "CREDIT"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Transactions - Filter by Date",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const today = new Date().toISOString().split('T')[0];",
+                  "pm.environment.set('current_date', today);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{transactions_url}}/transactions?startDate={{current_date}}&endDate={{current_date}}",
+              "host": ["{{transactions_url}}"],
+              "path": ["transactions"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "{{current_date}}"
+                },
+                {
+                  "key": "endDate",
+                  "value": "{{current_date}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Transaction status is CANCELLED', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('CANCELLED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Cliente solicitou cancelamento\"\n}"
+            },
+            "url": {
+              "raw": "{{transactions_url}}/transactions/{{transaction_id}}/cancel",
+              "host": ["{{transactions_url}}"],
+              "path": ["transactions", "{{transaction_id}}", "cancel"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Consolidation Service",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{consolidation_url}}/health",
+              "host": ["{{consolidation_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Daily Balance",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const today = new Date().toISOString().split('T')[0];",
+                  "pm.environment.set('current_date', today);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 or 404', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Response has balance details', function () {",
+                  "        var jsonData = pm.response.json();",
+                  "        pm.expect(jsonData).to.have.property('openingBalance');",
+                  "        pm.expect(jsonData).to.have.property('closingBalance');",
+                  "        pm.expect(jsonData).to.have.property('totalCredits');",
+                  "        pm.expect(jsonData).to.have.property('totalDebits');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{consolidation_url}}/consolidation/balance/{{merchant_id}}/{{current_date}}",
+              "host": ["{{consolidation_url}}"],
+              "path": ["consolidation", "balance", "{{merchant_id}}", "{{current_date}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Balance History",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const today = new Date();",
+                  "const endDate = today.toISOString().split('T')[0];",
+                  "const startDate = new Date(today.setDate(today.getDate() - 30)).toISOString().split('T')[0];",
+                  "",
+                  "pm.environment.set('start_date', startDate);",
+                  "pm.environment.set('end_date', endDate);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{consolidation_url}}/consolidation/balance/{{merchant_id}}?startDate={{start_date}}&endDate={{end_date}}",
+              "host": ["{{consolidation_url}}"],
+              "path": ["consolidation", "balance", "{{merchant_id}}"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "{{start_date}}"
+                },
+                {
+                  "key": "endDate",
+                  "value": "{{end_date}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Summary",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const today = new Date();",
+                  "const endDate = today.toISOString().split('T')[0];",
+                  "const startDate = new Date(today.setDate(today.getDate() - 30)).toISOString().split('T')[0];",
+                  "",
+                  "pm.environment.set('start_date', startDate);",
+                  "pm.environment.set('end_date', endDate);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has summary data', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('totalCredits');",
+                  "    pm.expect(jsonData).to.have.property('totalDebits');",
+                  "    pm.expect(jsonData).to.have.property('netChange');",
+                  "    pm.expect(jsonData).to.have.property('daysCount');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{consolidation_url}}/consolidation/summary/{{merchant_id}}?startDate={{start_date}}&endDate={{end_date}}",
+              "host": ["{{consolidation_url}}"],
+              "path": ["consolidation", "summary", "{{merchant_id}}"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "{{start_date}}"
+                },
+                {
+                  "key": "endDate",
+                  "value": "{{end_date}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "transactions_url",
+      "value": "http://localhost:3001/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "consolidation_url",
+      "value": "http://localhost:3002/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "merchant_id",
+      "value": "merchant_123",
+      "type": "string"
+    }
+  ]
+}
