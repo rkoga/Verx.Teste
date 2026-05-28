@@ -1,4 +1,4 @@
-import { PrismaClient } from '.prisma/client-reporting';
+import { PrismaClient } from '@prisma/client';
 import { Logger } from '../logging/logger';
 
 export class PrismaService {

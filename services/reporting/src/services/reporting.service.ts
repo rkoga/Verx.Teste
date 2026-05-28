@@ -1,4 +1,4 @@
-import { PrismaClient } from '.prisma/client-reporting';
+import { PrismaClient } from '@prisma/client';
 import { RedisService } from '../infrastructure/cache/redis.service';
 import { Logger } from '../infrastructure/logging/logger';
 

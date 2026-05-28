@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
-const client_reporting_1 = require(".prisma/client-reporting");
+const client_1 = require("@prisma/client");
 const logger_1 = require("../logging/logger");
 class PrismaService {
     constructor() {
         this.logger = new logger_1.Logger({ service: 'PrismaService' });
-        this.prisma = new client_reporting_1.PrismaClient({
+        this.prisma = new client_1.PrismaClient({
             log: [
                 { level: 'query', emit: 'event' },
                 { level: 'error', emit: 'event' },

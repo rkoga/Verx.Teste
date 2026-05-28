@@ -120,12 +120,6 @@ curl "http://localhost:3002/api/v1/consolidation/balance/merchant_123?startDate=
 curl "http://localhost:3002/api/v1/consolidation/summary/merchant_123?startDate=2026-05-01&endDate=2026-05-31"
 ```
 
-## 📚 Documentação Swagger
-
-Acesse a documentação interativa das APIs:
-
-- **Transactions API**: http://localhost:3001/api/docs
-- **Consolidation API**: http://localhost:3002/api/docs
 
 ## 🔍 Verificar Logs
 

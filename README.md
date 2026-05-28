@@ -281,12 +281,6 @@ Fornece relatórios e dashboards para análise financeira.
 - **[TESTING.md](TESTING.md)** - Guia de testes
 - **[QUICK_START.md](QUICK_START.md)** - Início rápido
 
-### Documentação dos Serviços
-
-- **[services/reporting/README.md](services/reporting/README.md)** - Reporting Service (257 linhas)
-- **[services/reporting/SETUP.md](services/reporting/SETUP.md)** - Setup do Reporting (267 linhas)
-- **[services/reporting/MIGRATIONS_GUIDE.md](services/reporting/MIGRATIONS_GUIDE.md)** - Guia de migrações (382 linhas)
-
 ### Documentação Arquitetural
 
 Veja a pasta `/docs` para documentação completa da arquitetura.
@@ -298,14 +292,22 @@ Veja a pasta `/docs` para documentação completa da arquitetura.
 ### Scripts PowerShell
 
 ```powershell
-# Setup completo do banco de dados
-.\setup-databases.ps1
+# Build completo 
+.\build-all.ps1
 
 # Iniciar todos os serviços
 .\start-all-services.ps1
 
 # Testar a API
 .\test-api.ps1
+
+# Testar endpoint de transações
+.\test-transactions-api
+
+# Testar endpoint de saldo      
+.\test-balance-api.ps1
+
+
 ```
 
 ### Scripts NPM (Raiz)
@@ -327,23 +329,17 @@ npm run clean
 # Transactions Service
 cd services/transactions
 npm run dev          # Modo desenvolvimento
-npm run build        # Build para produção
-npm run start:prod   # Iniciar em produção
-npm test             # Executar testes
+# npm test             # Executar testes
 
 # Consolidation Service
 cd services/consolidation
 npm run dev
-npm run build
-npm run start:prod
-npm test
+# npm test
 
 # Reporting Service
 cd services/reporting
 npm run dev
-npm run build
-npm run start:prod
-npm test
+# npm test
 ```
 
 ### Scripts Prisma
