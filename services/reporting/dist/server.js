@@ -17,11 +17,6 @@ const logger_1 = require("./infrastructure/logging/logger");
 (0, dotenv_1.config)();
 const logger = new logger_1.Logger({ service: 'ReportingServer' });
 class ReportingServer {
-    app;
-    prismaService;
-    redisService;
-    reportingService;
-    port;
     constructor() {
         this.app = (0, express_1.default)();
         this.port = parseInt(process.env.PORT || '3003', 10);

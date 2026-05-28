@@ -3,9 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HealthController = void 0;
 const logger_1 = require("../infrastructure/logging/logger");
 class HealthController {
-    prismaService;
-    redisService;
-    logger;
     constructor(prismaService, redisService) {
         this.prismaService = prismaService;
         this.redisService = redisService;

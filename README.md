@@ -27,26 +27,15 @@ Sistema completo de controle de fluxo de caixa construído com arquitetura de mi
 
 ## 🎯 Visão Geral
 
-O Cash Flow Control System é uma solução empresarial para gerenciamento de fluxo de caixa que permite:
+O Cash Flow Control System é uma solução para gerenciamento de fluxo de caixa que permite:
 
 - ✅ Registro e controle de transações financeiras (créditos e débitos)
 - ✅ Consolidação diária automática de saldos
 - ✅ Relatórios e dashboards em tempo real
 - ✅ Arquitetura escalável e resiliente
-- ✅ Observabilidade completa (métricas, logs, traces)
 - ✅ Cache distribuído para alta performance
 - ✅ Processamento assíncrono de eventos
 
-### Status do Projeto
-
-🎉 **TODOS OS SERVIÇOS COMPILADOS COM SUCESSO!**
-
-- ✅ Shared Module - Build Successful
-- ✅ Transactions Service - Build Successful
-- ✅ Consolidation Service - Build Successful
-- ✅ Reporting Service - Build Successful (100% Completo)
-
----
 
 ## 🏗️ Arquitetura
 
@@ -240,17 +229,12 @@ Gerencia todas as transações financeiras do sistema.
 
 **Responsabilidades:**
 - Criar transações (crédito/débito)
-- Validar transações
-- Cancelar transações
 - Publicar eventos de domínio
 
 **Endpoints principais:**
 - `POST /transactions` - Criar transação
 - `GET /transactions/:id` - Buscar transação
 - `GET /transactions` - Listar transações
-- `PATCH /transactions/:id/cancel` - Cancelar transação
-
-**Documentação:** http://localhost:3001/api-docs
 
 ### 2. Consolidation Service (Port 3002)
 
@@ -266,8 +250,6 @@ Consolida saldos diários e processa eventos de transações.
 - `GET /consolidation/balance/:date` - Saldo do dia
 - `GET /consolidation/balance/` - Histórico de saldos
 - `GET /consolidation/summary/` - Resumo financeiro
-
-**Documentação:** http://localhost:3002/api-docs
 
 ### 3. Reporting Service (Port 3003)
 

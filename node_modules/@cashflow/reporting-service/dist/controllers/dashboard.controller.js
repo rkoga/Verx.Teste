@@ -3,8 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DashboardController = void 0;
 const logger_1 = require("../infrastructure/logging/logger");
 class DashboardController {
-    reportingService;
-    logger;
     constructor(reportingService) {
         this.reportingService = reportingService;
         this.logger = new logger_1.Logger({ service: 'DashboardController' });

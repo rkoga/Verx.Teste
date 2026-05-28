@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logger = void 0;
 const winston_1 = __importDefault(require("winston"));
 class Logger {
-    logger;
-    context;
     constructor(options) {
         this.context = options.service;
         this.logger = winston_1.default.createLogger({

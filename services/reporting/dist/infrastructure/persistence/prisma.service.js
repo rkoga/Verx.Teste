@@ -4,8 +4,6 @@ exports.PrismaService = void 0;
 const client_reporting_1 = require(".prisma/client-reporting");
 const logger_1 = require("../logging/logger");
 class PrismaService {
-    prisma;
-    logger;
     constructor() {
         this.logger = new logger_1.Logger({ service: 'PrismaService' });
         this.prisma = new client_reporting_1.PrismaClient({

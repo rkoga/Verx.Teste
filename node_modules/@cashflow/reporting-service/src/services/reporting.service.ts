@@ -110,15 +110,31 @@ export class ReportingService {
       return cached;
     }
 
+    // Parse date string to ensure it's in correct format (YYYY-MM-DD)
+    // and create a Date object at midnight UTC
+    const dateStr = date.includes('T') ? date.split('T')[0] : date;
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const searchDate = new Date(Date.UTC(year, month - 1, day));
+
+    this.logger.info('Searching for balance', {
+      originalDate: date,
+      parsedDate: dateStr,
+      searchDate: searchDate.toISOString()
+    });
+
     // Get from database
     const balance = await this.prisma.dailyBalanceReadModel.findUnique({
       where: {
-        date: new Date(date),
+        date: searchDate,
       },
     });
 
     if (!balance) {
-      this.logger.warn('Balance not found', { date });
+      this.logger.warn('Balance not found', {
+        date,
+        searchDate: searchDate.toISOString(),
+        dateStr
+      });
       return null;
     }
 

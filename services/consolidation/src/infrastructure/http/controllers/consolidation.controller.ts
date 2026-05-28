@@ -170,9 +170,9 @@ export class ConsolidationController {
     @Param('date') dateStr: string,
     @Body() body: { transactions: TransactionData[] },
   ): Promise<BalanceResponseDto> {
-    // Parse date in local timezone to avoid timezone issues
+    // Parse date as UTC midnight to ensure consistent date handling
     const [year, month, day] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day, 12, 0, 0, 0); // Use noon to avoid timezone issues
+    const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
 
     const balance = await this.consolidationService.consolidateDay(
       date,

@@ -4,10 +4,8 @@ exports.RedisService = void 0;
 const redis_1 = require("redis");
 const logger_1 = require("../logging/logger");
 class RedisService {
-    client;
-    logger;
-    isConnected = false;
     constructor() {
+        this.isConnected = false;
         this.logger = new logger_1.Logger({ service: 'RedisService' });
         this.client = (0, redis_1.createClient)({
             url: process.env.REDIS_URL || 'redis://localhost:6379',

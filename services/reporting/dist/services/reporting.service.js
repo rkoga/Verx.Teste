@@ -4,13 +4,10 @@ exports.ReportingService = void 0;
 const redis_service_1 = require("../infrastructure/cache/redis.service");
 const logger_1 = require("../infrastructure/logging/logger");
 class ReportingService {
-    prisma;
-    redis;
-    logger;
-    DEFAULT_TTL = 300; // 5 minutes
-    BALANCE_TTL = 600; // 10 minutes
-    DASHBOARD_TTL = 180; // 3 minutes
     constructor(prisma, redis) {
+        this.DEFAULT_TTL = 300; // 5 minutes
+        this.BALANCE_TTL = 600; // 10 minutes
+        this.DASHBOARD_TTL = 180; // 3 minutes
         this.prisma = prisma;
         this.redis = redis;
         this.logger = new logger_1.Logger({ service: 'ReportingService' });
@@ -86,14 +83,28 @@ class ReportingService {
             this.logger.info('Balance retrieved from cache', { date });
             return cached;
         }
+        // Parse date string to ensure it's in correct format (YYYY-MM-DD)
+        // and create a Date object at midnight UTC
+        const dateStr = date.includes('T') ? date.split('T')[0] : date;
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const searchDate = new Date(Date.UTC(year, month - 1, day));
+        this.logger.info('Searching for balance', {
+            originalDate: date,
+            parsedDate: dateStr,
+            searchDate: searchDate.toISOString()
+        });
         // Get from database
         const balance = await this.prisma.dailyBalanceReadModel.findUnique({
             where: {
-                date: new Date(date),
+                date: searchDate,
             },
         });
         if (!balance) {
-            this.logger.warn('Balance not found', { date });
+            this.logger.warn('Balance not found', {
+                date,
+                searchDate: searchDate.toISOString(),
+                dateStr
+            });
             return null;
         }
         // Cache the result

@@ -124,11 +124,14 @@ export class ConsolidationService {
    */
   private async syncToReportingDatabase(balance: DailyBalance): Promise<void> {
     try {
+      // Format date as YYYY-MM-DD string to ensure consistent storage
+      const dateStr = balance.date.toISOString().split('T')[0];
+      
       const query = `
         INSERT INTO daily_balance_read_model (
           id, date, "openingBalance", "totalCredits", "totalDebits",
           "closingBalance", "transactionCount", "createdAt", "updatedAt"
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ) VALUES ($1, $2::date, $3, $4, $5, $6, $7, $8, $9)
         ON CONFLICT (date)
         DO UPDATE SET
           "openingBalance" = EXCLUDED."openingBalance",
@@ -139,9 +142,16 @@ export class ConsolidationService {
           "updatedAt" = EXCLUDED."updatedAt"
       `;
 
+      this.logger.info('Syncing balance to reporting database', {
+        balanceId: balance.id,
+        date: dateStr,
+        openingBalance: balance.openingBalance.value,
+        closingBalance: balance.closingBalance.value,
+      });
+
       await this.reportingPool.query(query, [
         balance.id,
-        balance.date,
+        dateStr,
         balance.openingBalance.value,
         balance.totalCredits.value,
         balance.totalDebits.value,
@@ -151,14 +161,16 @@ export class ConsolidationService {
         balance.updatedAt,
       ]);
 
-      this.logger.info('Synced balance to reporting database', {
+      this.logger.info('Successfully synced balance to reporting database', {
         balanceId: balance.id,
-        date: balance.date.toISOString().split('T')[0],
+        date: dateStr,
       });
     } catch (error: any) {
       this.logger.error('Failed to sync to reporting database', {
         error: error.message,
+        stack: error.stack,
         balanceId: balance.id,
+        date: balance.date.toISOString().split('T')[0],
       });
       // Don't throw - consolidation should succeed even if sync fails
     }

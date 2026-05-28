@@ -3,8 +3,16 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy shared module to the expected location
+# Copy shared module first
 COPY shared ../../shared
+
+# Install shared module dependencies
+WORKDIR /shared
+COPY shared/package*.json ./
+RUN npm install
+
+# Go back to app directory
+WORKDIR /app
 
 # Copy package files from consolidation service
 COPY services/consolidation/package*.json ./

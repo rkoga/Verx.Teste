@@ -235,33 +235,3 @@ Logs estruturados em JSON com Winston:
   "merchantId": "merchant-123"
 }
 ```
-
-## 🚦 Status do Projeto
-
-- ✅ Estrutura base
-- ✅ Read models
-- ✅ Cache layer
-- ✅ Controllers
-- ✅ Health checks
-- ✅ Docker support
-- ⏳ Testes unitários
-- ⏳ Testes E2E
-- ⏳ Swagger documentation
-
-## 📚 Documentação Adicional
-
-- [Prisma Schema](./prisma/schema.prisma)
-- [API Routes](./src/routes/index.ts)
-- [Cache Strategy](./src/infrastructure/cache/redis.service.ts)
-
-## 🤝 Contribuindo
-
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
-
-## 📄 Licença
-
-MIT
